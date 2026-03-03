@@ -1,4 +1,10 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 public class ProdutoPerecivel extends Produto {
     
@@ -34,6 +40,10 @@ public class ProdutoPerecivel extends Produto {
     */
     @Override
     public String gerarDadosTexto() {
-        
-    }
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    String precoFormatado = String.format("%.2f", precoCusto).replace("," , ".");
+    String margemFormatado = String.format("%.2f", margemLucro).replace("," , ".");
+    String dataFormatada = formato.format(dataDeValidade);
+    return String.format("1;%s;%s;%s;%s", descricao, precoFormatado, margemFormatado, dataFormatada);
+}
 }
