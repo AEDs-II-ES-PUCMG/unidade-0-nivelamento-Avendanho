@@ -1,9 +1,9 @@
 public class ItemDePedido {
 
     // Atributos encapsulados
-    private Produto produto;
-    private int quantidade;
-    private double precoVenda;
+    public Produto produto;
+    public int quantidade;
+    public double precoVenda;
 
     /**
      * Construtor da classe ItemDePedido.

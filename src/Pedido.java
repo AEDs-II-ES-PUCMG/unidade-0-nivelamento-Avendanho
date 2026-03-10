@@ -10,7 +10,7 @@ public class Pedido {
 	private static final double DESCONTO_PG_A_VISTA = 0.15;
 	
 	/** Vetor para armazenar os produtos do pedido */
-	private Produto[] produtos;
+	private ItemDePedido[] items;
 	
 	/** Data de criação do pedido */
 	private LocalDate dataPedido;
@@ -27,7 +27,7 @@ public class Pedido {
 	 */  
 	public Pedido(LocalDate dataPedido, int formaDePagamento) {
 		
-		produtos = new Produto[MAX_PRODUTOS];
+		items = new ItemDePedido[MAX_PRODUTOS];
 		quantProdutos = 0;
 		this.dataPedido = dataPedido;
 		this.formaDePagamento = formaDePagamento;
@@ -38,10 +38,10 @@ public class Pedido {
      * @param novo O produto a ser incluído no pedido
      * @return true/false indicando se a inclusão do produto no pedido foi realizada com sucesso.
      */
-	public boolean incluirProduto(Produto novo) {
+	public boolean incluirPedido(ItemDePedido novo) {
 		
 		if (quantProdutos < MAX_PRODUTOS) {
-			produtos[quantProdutos++] = novo;
+			items[quantProdutos++] = novo;
 			return true;
 		}
 		return false;
@@ -57,7 +57,7 @@ public class Pedido {
 		double valorPedido = 0;
 		
 		for (int i = 0; i < quantProdutos; i++) {
-			valorPedido += produtos[i].valorDeVenda();
+			valorPedido += items[i].precoVenda;
 		}
 		
 		if (formaDePagamento == 1) {
@@ -94,7 +94,7 @@ public class Pedido {
 		stringPedido.append("Pedido com " + quantProdutos + " produtos.\n");
 		stringPedido.append("Produtos no pedido:\n");
 		for (int i = 0; i < quantProdutos; i++ ) {
-			stringPedido.append(produtos[i].toString() + "\n");
+			stringPedido.append(items[i].toString() + "\n");
 		}
 		
 		stringPedido.append("Pedido pago ");
@@ -117,30 +117,53 @@ public class Pedido {
     @Override
     public boolean equals(Object obj) {
         Pedido outro = (Pedido)obj;
-		return this.produtos.equals(outro.produtos);
+		return this.items.equals(outro.items);
     }
 
 	public void mesclarPedido(Pedido outroPedido) {
-		int somaProdutos = outroPedido.produtos.length + this.produtos.length;
+		int somaProdutos = outroPedido.items.length + this.items.length;
 		if (somaProdutos > MAX_PRODUTOS) {
 			throw new IllegalStateException();
 		}
 		else {
 			for (int i = 0; i <= MAX_PRODUTOS; i++) {
-				int Incremento = this.produtos.length;
-				if (this.produtos[i].equals(outroPedido.produtos[i])) {
-					if (this.produtos[Incremento].precoCusto > outroPedido.produtos[i].precoCusto) {
-						this.produtos[Incremento].precoCusto = outroPedido.produtos[i].precoCusto;
-						outroPedido.produtos[i].precoCusto*=2;
+				int Incremento = this.items.length;
+				if (this.items[i].equals(outroPedido.items[i])) {
+					if (this.items[Incremento].precoVenda > outroPedido.items[i].precoVenda) {
+						this.items[Incremento].precoVenda = outroPedido.items[i].precoVenda;
+						outroPedido.items[i].precoVenda*=2;
 					}
 				}
 				else {
-					this.produtos[Incremento] = outroPedido.produtos[i];
-					outroPedido.produtos[i] = null;
+					this.items[Incremento] = outroPedido.items[i];
+					outroPedido.items[i] = null;
 					Incremento++;
 				}
 			}
 		}
 	}
 
+	public String imprimirRecibo() {
+
+		double precoTotal = 0;
+		
+		StringBuilder stringPedido = new StringBuilder();
+
+		stringPedido.append("Produtos no pedido:\n");		
+		for (int i = 0; i < items.length; i++) {
+			precoTotal += items[i].precoVenda *= items[i].quantidade;
+		stringPedido.append("Nome: " + items[i].produto);
+		stringPedido.append("Quantidade: " + items[i].quantidade);
+		stringPedido.append("Preço de Cada Unidade: " + items[i].precoVenda / items[i].quantidade);
+		if (items[i].quantidade > 10) {
+			double valorComDesconto = items[i].precoVenda - items[i].precoVenda *0.05;
+			stringPedido.append("Preço de todos os items: " + valorComDesconto);
+		}
+		else {
+			stringPedido.append("Preço de todos os items: " + items[i].precoVenda);
+		}
+		}
+		stringPedido.append("Preço total: " + precoTotal);
+		return stringPedido.toString();
+	}
 }
